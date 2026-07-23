@@ -1,6 +1,7 @@
 import products
 from store import Store
 
+
 def show_products(best_buy):
     """Displays all active products."""
     product_list = best_buy.get_all_products()
@@ -8,8 +9,7 @@ def show_products(best_buy):
     print("\n------ Product List ------")
 
     for index, product in enumerate(product_list, start=1):
-        print(f"{index}. ", end="")
-        product.show()
+        print(f"{index}. {product.show()}")
 
 
 def show_total_quantity(best_buy):
@@ -117,6 +117,16 @@ def main():
             "Google Pixel 7",
             price=500,
             quantity=250
+        ),
+        products.NonStockedProduct(
+            "Windows License",
+            price=125
+        ),
+        products.LimitedProduct(
+            "Shipping",
+            price=10,
+            quantity=250,
+            maximum=1
         )
     ]
 
@@ -126,3 +136,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
