@@ -1,7 +1,6 @@
 import products
 from store import Store
 
-
 def show_products(best_buy):
     """Displays all active products."""
     product_list = best_buy.get_all_products()
