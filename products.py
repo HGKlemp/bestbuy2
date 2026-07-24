@@ -2,7 +2,7 @@ class Product:
     """Represents a product in the store."""
 
     def __init__(self, name, price, quantity, active=True):
-        """Creates a new product."""
+        """Create a new product."""
         if not isinstance(name, str) or not name:
             raise ValueError("Name must be a non-empty string.")
 
@@ -19,13 +19,22 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = active
+        self.promotion = None
+
+    def get_promotion(self):
+        """Return the product's promotion."""
+        return self.promotion
+
+    def set_promotion(self, promotion):
+        """Set the product's promotion."""
+        self.promotion = promotion
 
     def get_quantity(self):
-        """Returns the available quantity."""
+        """Return the available quantity."""
         return self.quantity
 
     def set_quantity(self, quantity):
-        """Updates the available quantity."""
+        """Update the available quantity."""
         if not isinstance(quantity, int) or quantity < 0:
             raise ValueError("Quantity must be a non-negative integer.")
 
@@ -35,28 +44,30 @@ class Product:
             self.deactivate()
 
     def is_active(self):
-        """Returns whether the product is active."""
+        """Return whether the product is active."""
         return self.active
 
     def activate(self):
-        """Activates the product."""
+        """Activate the product."""
         self.active = True
 
     def deactivate(self):
-        """Deactivates the product."""
+        """Deactivate the product."""
         self.active = False
 
     def show(self):
-        """Returns the product information."""
+        """Return the product information."""
         return (
             f"{self.name}, Price: {self.price}, "
             f"Quantity: {self.quantity}"
         )
 
     def buy(self, quantity):
-        """Buys a quantity and returns its price."""
+        """Buy a quantity of the product and return the total price."""
         if not isinstance(quantity, int) or quantity <= 0:
-            raise ValueError("Purchase quantity must be a positive integer.")
+            raise ValueError(
+                "Purchase quantity must be a positive integer."
+            )
 
         if quantity > self.quantity:
             raise ValueError(
@@ -68,6 +79,9 @@ class Product:
         if self.quantity == 0:
             self.deactivate()
 
+        if self.promotion is not None:
+            return self.promotion.apply_promotion(self, quantity)
+
         return quantity * self.price
 
 
@@ -75,26 +89,31 @@ class NonStockedProduct(Product):
     """Represents a product whose quantity is not tracked."""
 
     def __init__(self, name, price):
-        """Creates a non-stocked product."""
+        """Create a non-stocked product."""
         super().__init__(name, price, quantity=0)
 
     def set_quantity(self, quantity):
-        """Keeps the quantity permanently at zero."""
+        """Keep the quantity permanently at zero."""
         self.quantity = 0
 
     def show(self):
-        """Returns the non-stocked product information."""
+        """Return the non-stocked product information."""
         product_information = super().show()
 
         return product_information.replace(
             "Quantity: 0",
-            "Quantity: Unlimited"
+            "Quantity: Unlimited",
         )
 
     def buy(self, quantity):
-        """Returns the price without changing the quantity."""
+        """Return the price without changing the quantity."""
         if not isinstance(quantity, int) or quantity <= 0:
-            raise ValueError("Purchase quantity must be a positive integer.")
+            raise ValueError(
+                "Purchase quantity must be a positive integer."
+            )
+
+        if self.promotion is not None:
+            return self.promotion.apply_promotion(self, quantity)
 
         return quantity * self.price
 
@@ -103,7 +122,7 @@ class LimitedProduct(Product):
     """Represents a product with a purchase limit."""
 
     def __init__(self, name, price, quantity, maximum):
-        """Creates a limited product."""
+        """Create a limited product."""
         super().__init__(name, price, quantity)
 
         if not isinstance(maximum, int) or maximum <= 0:
@@ -112,7 +131,7 @@ class LimitedProduct(Product):
         self.maximum = maximum
 
     def show(self):
-        """Returns the limited product information."""
+        """Return the limited product information."""
         product_information = super().show()
 
         return (
@@ -121,10 +140,11 @@ class LimitedProduct(Product):
         )
 
     def buy(self, quantity):
-        """Buys a quantity if it does not exceed the limit."""
+        """Buy a quantity if it does not exceed the purchase limit."""
         if quantity > self.maximum:
             raise ValueError(
                 f"Only {self.maximum} items can be purchased per order."
             )
 
         return super().buy(quantity)
+

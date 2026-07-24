@@ -1,9 +1,14 @@
 import products
+from promotion import (
+    PercentDiscount,
+    SecondHalfPrice,
+    ThirdOneFree,
+)
 from store import Store
 
 
 def show_products(best_buy):
-    """Displays all active products."""
+    """Display all active products."""
     product_list = best_buy.get_all_products()
 
     print("\n------ Product List ------")
@@ -13,13 +18,13 @@ def show_products(best_buy):
 
 
 def show_total_quantity(best_buy):
-    """Displays the total product quantity."""
+    """Display the total product quantity."""
     total_quantity = best_buy.get_total_quantity()
     print(f"\nTotal amount in store: {total_quantity}")
 
 
 def create_shopping_list(best_buy):
-    """Creates a shopping list from user input."""
+    """Create a shopping list from user input."""
     shopping_list = []
     product_list = best_buy.get_all_products()
 
@@ -31,13 +36,13 @@ def create_shopping_list(best_buy):
             "(or press ENTER to finish): "
         )
 
-        if product_number == "":
+        if not product_number:
             break
 
         try:
             product_number = int(product_number)
 
-            if product_number < 1 or product_number > len(product_list):
+            if not 1 <= product_number <= len(product_list):
                 print("Invalid product number.")
                 continue
 
@@ -56,10 +61,10 @@ def create_shopping_list(best_buy):
 
 
 def make_order(best_buy):
-    """Creates and processes an order."""
+    """Create and process an order."""
     shopping_list = create_shopping_list(best_buy)
 
-    if len(shopping_list) == 0:
+    if not shopping_list:
         print("No products selected.")
         return
 
@@ -73,7 +78,7 @@ def make_order(best_buy):
 
 
 def start(best_buy):
-    """Starts the store menu."""
+    """Start the store menu."""
     while True:
         print("\n========== Best Buy ==========")
         print("1. List all products in store")
@@ -101,33 +106,47 @@ def start(best_buy):
 
 
 def main():
-    """Creates the inventory and starts the program."""
+    """Create the inventory and start the program."""
+    second_half_price = SecondHalfPrice("Second Half Price")
+    third_one_free = ThirdOneFree("Third One Free")
+    thirty_percent = PercentDiscount("Thirty Percent", 30)
+
+    macbook = products.Product(
+        "MacBook Air M2",
+        price=1450,
+        quantity=100,
+    )
+    bose_quiet_comfort = products.Product(
+        "Bose QuietComfort Earbuds",
+        price=250,
+        quantity=500,
+    )
+    google_pixel = products.Product(
+        "Google Pixel 7",
+        price=500,
+        quantity=250,
+    )
+    windows_license = products.NonStockedProduct(
+        "Windows License",
+        price=125,
+    )
+    shipping = products.LimitedProduct(
+        "Shipping",
+        price=10,
+        quantity=250,
+        maximum=1,
+    )
+
+    macbook.set_promotion(thirty_percent)
+    bose_quiet_comfort.set_promotion(second_half_price)
+    google_pixel.set_promotion(third_one_free)
+
     product_list = [
-        products.Product(
-            "MacBook Air M2",
-            price=1450,
-            quantity=100
-        ),
-        products.Product(
-            "Bose QuietComfort Earbuds",
-            price=250,
-            quantity=500
-        ),
-        products.Product(
-            "Google Pixel 7",
-            price=500,
-            quantity=250
-        ),
-        products.NonStockedProduct(
-            "Windows License",
-            price=125
-        ),
-        products.LimitedProduct(
-            "Shipping",
-            price=10,
-            quantity=250,
-            maximum=1
-        )
+        macbook,
+        bose_quiet_comfort,
+        google_pixel,
+        windows_license,
+        shipping,
     ]
 
     best_buy = Store(product_list)
@@ -136,4 +155,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
